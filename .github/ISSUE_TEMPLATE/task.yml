@@ -1,5 +1,5 @@
-name: Task / Bug
-description: Structured issue creation
+name: Feature / Task
+description: New feature or improvement
 title: "[TASK]: "
 labels: ["task"]
 
@@ -7,25 +7,21 @@ body:
   - type: textarea
     id: problem
     attributes:
-      label: Problem
-      description: What is the issue?
-      placeholder: Describe clearly
+      label: Problem / Requirement
     validations:
       required: true
 
   - type: textarea
-    id: expected
+    id: solution
     attributes:
-      label: Expected Behavior
-      placeholder: What should happen?
+      label: Proposed Solution
     validations:
       required: true
 
   - type: textarea
-    id: steps
+    id: implementation
     attributes:
-      label: Steps to Reproduce / Implement
-      placeholder: Step 1, Step 2...
+      label: Implementation Steps
     validations:
       required: true
 
@@ -33,6 +29,5 @@ body:
     id: priority
     attributes:
       label: Priority
-      placeholder: low / medium / high
     validations:
       required: true
