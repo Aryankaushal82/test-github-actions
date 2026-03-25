@@ -1,0 +1,38 @@
+name: Task / Bug
+description: Structured issue creation
+title: "[TASK]: "
+labels: ["task"]
+
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is the issue?
+      placeholder: Describe clearly
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      placeholder: What should happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce / Implement
+      placeholder: Step 1, Step 2...
+    validations:
+      required: true
+
+  - type: input
+    id: priority
+    attributes:
+      label: Priority
+      placeholder: low / medium / high
+    validations:
+      required: true
