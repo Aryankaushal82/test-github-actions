@@ -1,0 +1,56 @@
+name: PR Guard
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  validate-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate Linked Issue Quality
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || "";
+            const match = body.match(/Closes\s+#(\d+)/i);
+
+            if (!match) {
+              core.setFailed("PR must link an issue using 'Closes #123'");
+              return;
+            }
+
+            const issue_number = match[1];
+
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number
+            });
+
+            const issueBody = issue.body || "";
+
+            // Minimum length check
+            if (issueBody.length < 100) {
+              core.setFailed("Issue description too short. Add proper details.");
+            }
+
+            // Weak content detection
+            const weakPatterns = [
+              /^[a-z]{1,4}$/i,
+              /(test|abc|xyz|123)/i
+            ];
+
+            if (weakPatterns.some(p => p.test(issueBody))) {
+              core.setFailed("Issue content looks invalid or placeholder text.");
+            }
+
+            // Required sections
+            if (
+              !issueBody.includes("Bug Description") ||
+              !issueBody.includes("Steps to Reproduce") ||
+              !issueBody.includes("Expected Behavior")
+            ) {
+              core.setFailed("Issue is not properly structured.");
+            }
