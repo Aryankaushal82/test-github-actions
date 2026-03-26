@@ -31,26 +31,38 @@ jobs:
 
             const issueBody = issue.body || "";
 
-            // Minimum length check
-            if (issueBody.length < 100) {
-              core.setFailed("Issue description too short. Add proper details.");
+            const text = issueBody.toLowerCase().trim();
+
+            // 1. Length check
+            if (text.length < 120) {
+              core.setFailed("Issue too short. Add meaningful details.");
+              return;
             }
 
-            // Weak content detection
-            const weakPatterns = [
-              /^[a-z]{1,4}$/i,
-              /(test|abc|xyz|123)/i
-            ];
+            // 2. Split into lines
+            const sections = text
+              .split(/\n+/)
+              .map(s => s.trim())
+              .filter(s => s.length > 0);
 
-            if (weakPatterns.some(p => p.test(issueBody))) {
-              core.setFailed("Issue content looks invalid or placeholder text.");
+            const actualContent = sections.filter(s => !s.startsWith("###"));
+
+            // 3. Garbage detection
+            const isGarbage = actualContent.some(line => {
+              return (
+                line.length < 5 ||
+                /^[a-z]{1,5}$/.test(line) ||
+                /(test|123|aaa|bbb)/.test(line)
+              );
+            });
+
+            if (isGarbage) {
+              core.setFailed("Issue contains low-quality or placeholder content.");
+              return;
             }
 
-            // Required sections
-            if (
-              !issueBody.includes("Bug Description") ||
-              !issueBody.includes("Steps to Reproduce") ||
-              !issueBody.includes("Expected Behavior")
-            ) {
-              core.setFailed("Issue is not properly structured.");
+            // 4. Minimum meaningful lines
+            if (actualContent.length < 3) {
+              core.setFailed("Issue must contain detailed explanation.");
+              return;
             }
